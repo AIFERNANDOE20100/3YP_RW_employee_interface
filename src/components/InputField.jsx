@@ -10,7 +10,7 @@ const InputField = ({ type, placeholder, icon }) => {
         type={isPasswordShown ? 'text' : type}
         placeholder={placeholder}
         className="input-field"
-        required
+        // required
       />
       <i className="material-symbols-rounded">{icon}</i>
     </div>

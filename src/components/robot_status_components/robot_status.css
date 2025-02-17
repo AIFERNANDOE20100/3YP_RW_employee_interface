@@ -1,0 +1,59 @@
+/* Main Container Styling */
+.robot-status-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  border: 2px solid black;
+  border-radius: 16px;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  max-width: 400px;
+  margin: 20px auto;
+  transition: transform 0.3s ease;
+}
+
+/* Hover Effect */
+.robot-status-container:hover {
+  transform: translateY(-5px);
+}
+
+/* Title Styling */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #222;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+/* Row Styling */
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.batteryPercentage,.performanceStatus {
+  color: #222;
+  font-weight: 600;
+}
+
+/* Icon Styling */
+.icon {
+  width: 32px;
+  height: 32px;
+  color: #222;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .robot-status-container {
+    padding: 16px;
+  }
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
+}

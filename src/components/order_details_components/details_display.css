@@ -1,0 +1,58 @@
+/* Main Container Styling */
+.container-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border: 2px solid black;
+    border-radius: 16px;
+    box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
+    background-color: white;
+    max-width: 500px;
+    margin: 20px auto;
+    transition: transform 0.3s ease;
+  }
+  
+  /* Hover Effect */
+  .container-box:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* Left Section Styling */
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  /* Text Styling */
+  .label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  .customer-details,.order-no {
+    color: blueviolet;
+  }
+  
+  /* Right Section (Button) Styling */
+  .button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    .container-box {
+      flex-direction: column;
+      text-align: center;
+      padding: 16px;
+    }
+  
+    .button-container {
+      margin-top: 16px;
+    }
+  }
+  

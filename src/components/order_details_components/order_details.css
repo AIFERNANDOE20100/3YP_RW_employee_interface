@@ -1,0 +1,52 @@
+.order-details-wrapper {
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Title Styling */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #222;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+/* Scrollable Container */
+.scroll-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 4 items per row */
+  gap: 20px;
+  /* overflow-y: auto; Enable vertical scrolling */
+  /* max-height: 500px; Adjust height to fit the scrollable area */
+  padding-bottom: 16px;
+}
+
+/* Hide Scrollbar for a cleaner look */
+.scroll-container::-webkit-scrollbar {
+  width: 8px; /* Vertical scrollbar */
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: #ddd;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .scroll-container {
+    grid-template-columns: repeat(2, 1fr); /* 2 items per row on smaller screens */
+  }
+}
+
+@media (max-width: 480px) {
+  .scroll-container {
+    grid-template-columns: 1fr; /* 1 item per row on very small screens */
+  }
+}
