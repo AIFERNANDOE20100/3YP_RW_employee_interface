@@ -2,17 +2,16 @@
 .parent {
     display: grid;
     grid-template-columns: repeat(2, 2fr, 1fr);
-    grid-template-rows: auto;
-    gap: 10px;
-    padding: 10px;
+    grid-template-rows: auto 130px;
+    gap: 5px;
+    padding: 5px;
     max-width: 100%;
-    margin: 0 auto;
   }
   
   /* Large Component - Spanning 2 Columns */
   .large {
     grid-column: span 2;
-    padding: 10px;
+    padding: 5px;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
@@ -20,12 +19,11 @@
   
   /* Small Components */
   .small {
-    padding: 10px;
+    padding: 5px;
     border-radius: 12px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     text-align: center;
     overflow-y: auto; /* Enable vertical scrolling */
-    max-height: 250px; /* Set a height limit for the scrolling container */
     background-color: white;
   }
   

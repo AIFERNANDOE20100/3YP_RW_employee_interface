@@ -2,14 +2,15 @@
 .robot-status-container {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 20px;
+  gap: 10px;
+  padding: 10px;
   border: 2px solid black;
   border-radius: 16px;
   box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.2);
   background-color: white;
   max-width: 400px;
-  margin: 20px auto;
+  max-height: 100px;
+  margin: 10px auto;
   transition: transform 0.3s ease;
 }
 
@@ -20,11 +21,11 @@
 
 /* Title Styling */
 .title {
-  font-size: 24px;
+  font-size: 12px;
   font-weight: bold;
   color: #222;
   text-align: center;
-  margin-bottom: 12px;
+  margin-bottom: 5px;
 }
 
 /* Row Styling */
@@ -41,8 +42,8 @@
 
 /* Icon Styling */
 .icon {
-  width: 32px;
-  height: 32px;
+  width: 20px;
+  height: 20px;
   color: #222;
 }
 

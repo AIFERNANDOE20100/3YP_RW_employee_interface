@@ -17,7 +17,7 @@ const Signup = () => {
       </form>
 
       <p className="login-prompt">
-        Already have an account? <Link to="/">Login</Link>
+        Already have an account? <Link to="/login">Login</Link>
       </p>
     </div>
   );
