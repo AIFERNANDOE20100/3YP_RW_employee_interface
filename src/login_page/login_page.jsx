@@ -9,7 +9,7 @@ const Login = () => {
   const handleLogin = (e) => {
     e.preventDefault();
     // Add your form validation or API call here
-    navigate("/videofeed"); // Redirect after login
+    navigate("/robot"); // Redirect after login
   };
 
   return (

@@ -1,0 +1,65 @@
+/* Robot Page Container */
+.robot-page-container {
+  position: relative;
+  min-height: 100vh; /* Ensure full page height */
+}
+
+/* Profile Container - Precisely in Top-Right Corner */
+.profile-container {
+  position: fixed; /* Fixed ensures it stays on the screen */
+  top: 16px; /* Distance from the top */
+  right: 16px; /* Distance from the right */
+  z-index: 1000; /* Ensure it stays on top */
+}
+
+/* Grid container for robot cards */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Always 4 grids per row */
+  gap: 16px;
+  padding: 16px;
+  margin-top: 64px; /* Avoid overlap with profile icon */
+}
+
+/* Robot card styling */
+.robot-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.robot-card:hover {
+  transform: translateY(-5px); /* Hover animation */
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .grid-container {
+      grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-container {
+      grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-container {
+      grid-template-columns: repeat(1, 1fr);
+  }
+
+  .profile-container {
+      top: 8px; /* Adjust position for smaller screens */
+      right: 8px;
+  }
+}

@@ -1,8 +1,6 @@
-import React from "react";
-import RobotCard from "./robot_card";
-import RoboAlpha from "./robot_alpha.jpg"; // Use relative path
+import RoboAlpha from "../../assets/robot_alpha.jpg"
 
-const robots = [
+export const robots = [
   {
     name: "paniya Alpha",
     description: "AI-powered assistant",
@@ -34,23 +32,3 @@ const robots = [
     imageUrl: RoboAlpha,
   },
 ];
-
-const RobotList = () => {
-  const handleCardClick = (name) => {
-    alert(`Entering ${name}...`); // Replace with navigation logic
-  };
-
-  return (
-    <div className="robot-list">
-      {robots.map((robot, index) => (
-        <RobotCard
-          key={index}
-          {...robot}
-          onClick={() => handleCardClick(robot.name)}
-        />
-      ))}
-    </div>
-  );
-};
-
-export default RobotList;
