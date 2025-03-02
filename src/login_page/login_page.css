@@ -1,156 +1,137 @@
-/* Importing Google Fonts - Montserrat */
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Montserrat", sans-serif;
-}
-
+/* General Page Styling */
 body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #faf6f1;
   display: flex;
-  align-items: center;
   justify-content: center;
-  min-height: 100vh;
-  background: #F9F6EE;
-}
-
-#root {
-  width: 100%;
-  padding: 0.6rem;
-}
-
-.login-container {
-  margin: 0 auto;
-  max-width: 410px;
-  padding: 2rem 1.5rem;
-  border-radius: 0.5rem;
-  background: #fff;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-}
-
-.login-container .form-title {
-  text-align: center;
-  font-size: 1.37rem;
-  font-weight: 600;
-  margin-bottom: 1.87rem;
-}
-
-
-.login-form .input-wrapper {
-  height: 54px;
-  width: 100%;
-  position: relative;
-  margin-bottom: 1.5rem;
-}
-
-.login-form .input-field {
-  width: 100%;
-  height: 100%;
-  outline: none;
-  font-size: 1.06rem;
-  border-radius: 0.31rem;
-  border: 1px solid #bfb3f2;
-  padding: 0px 1.25rem 0 3.12rem;
-  transition: 0.2s ease;
-}
-
-.login-form .input-field:focus {
-  border-color: #5F41E4;
-}
-
-.login-form .input-field::placeholder {
-  color: #9284c8;
-}
-
-.login-form .input-wrapper i {
-  position: absolute;
-  top: 50%;
-  height: 100%;
-  display: flex;
-  color: #a395e0;
   align-items: center;
-  transform: translateY(-50%);
-  transition: 0.2s ease;
+  height: 100vh;
+  margin: 0;
 }
 
-.login-form .input-wrapper i:not(.eye-icon) {
-  left: 0.93rem;
-  pointer-events: none;
-}
-
-.login-form .input-field:focus ~ i:not(.eye-icon) {
-  color: #5F41E4;
-}
-
-.login-form .input-wrapper i.eye-icon {
-  display: none;
-  right: 0.93rem;
-  color: #917DE8;
-  cursor: pointer;
-  font-size: 1.25rem;
-}
-
-.login-form .input-wrapper .input-field:valid ~ .eye-icon {
-  display: flex;
-}
-
-.login-form .forgot-password-link {
-  display: block;
-  width: fit-content;
-  margin-top: -0.44rem;
-}
-
-.login-form .login-button {
-  border: none;
-  outline: none;
+/* Login Container */
+.login-container {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  max-width: 400px;
   width: 100%;
-  height: 54px;
-  color: #fff;
-  font-size: 1.125rem;
-  font-weight: 500;
+  transition: 0.3s ease-in-out;
+}
+
+.login-container:hover {
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Title Styling */
+.form-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* Input Fields */
+.login-form input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.login-form input:focus {
+  border-color: #6a5acd;
+  box-shadow: 0px 0px 5px rgba(106, 90, 205, 0.5);
+}
+
+/* Forgot Password Link */
+.forgot-password-link {
+  display: block;
+  text-align: left;
+  color: #6a5acd;
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+  color: #483d8b;
+}
+
+/* Login Button */
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #6a5acd;
+  border: none;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
   cursor: pointer;
-  margin-top: 2.19rem;
-  border-radius: 0.31rem;
-  background: #5F41E4;
-  transition: 0.3s ease;
+  transition: 0.3s;
 }
 
-.login-form .login-button:hover {
-  background: #4320df;
+.login-button:hover {
+  background-color: #5a4fcf;
 }
 
-.login-container .signup-prompt {
-  text-align: center;
-  font-size: 1.06rem;
-  font-weight: 500;
-  margin: 1.75rem 0 0.31rem;
+/* Success & Error Messages */
+.popup {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
 }
 
-.login-container a {
-  color: #5F41E4;
-  font-weight: 500;
-  text-decoration: none;
+.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
 }
 
-.login-container a:hover {
-  text-decoration: underline;
+.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
+/* Sign Up Prompt */
 .signup-prompt {
-  text-align: center;
-  font-size: 1.06rem;
-  font-weight: 500;
-  margin-top: 1.5rem;
+  margin-top: 15px;
+  font-size: 14px;
 }
 
-.signup-link {
-  color: #5F41E4;
-  font-weight: 600;
+.signup-prompt a {
+  color: #6a5acd;
+  font-weight: bold;
   text-decoration: none;
+  transition: 0.3s;
 }
 
-.signup-link:hover {
+.signup-prompt a:hover {
   text-decoration: underline;
+  color: #483d8b;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .login-container {
+      padding: 1.5rem;
+  }
+  .form-title {
+      font-size: 18px;
+  }
+  .login-form input, .login-button {
+      font-size: 14px;
+  }
 }
