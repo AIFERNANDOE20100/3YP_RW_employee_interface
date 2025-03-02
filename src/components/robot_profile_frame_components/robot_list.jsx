@@ -4,7 +4,7 @@ export const robots = [
   {
     name: "paniya Alpha",
     description: "AI-powered assistant",
-    status: "online",
+    status: "online", // online(green), offline(red), or active(blue)
     imageUrl: RoboAlpha,
   },
   {
