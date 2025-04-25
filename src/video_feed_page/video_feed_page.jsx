@@ -9,7 +9,7 @@ const VideoFeedPage = () => {
   const [intervals, setIntervals] = useState({});
 
   const sendKeyPress = (key) => {
-    fetch("http://localhost:3000/api/keyPress", {
+    fetch("http://localhost:5000/api/keyPress", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -84,7 +84,7 @@ const VideoFeedPage = () => {
         <OrderDetails />
       </div>
       <div className="small">
-        <RobotStatus batteryPercentage={80} performanceStatus={20} />
+        <RobotStatus />
       </div>
     </div>
   );
