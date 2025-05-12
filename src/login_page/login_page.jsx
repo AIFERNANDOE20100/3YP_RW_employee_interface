@@ -17,6 +17,9 @@ const Login = () => {
       const data = await loginUser(email, password);
       console.log("Login successful:", data);
 
+      // Save restaurantId to localStorage
+      localStorage.setItem("restaurantId", data.user.restaurantId);
+
       setSuccessMessage("Login successful! Redirecting...");
 
       setTimeout(() => {
