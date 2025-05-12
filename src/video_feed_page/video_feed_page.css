@@ -6,6 +6,12 @@ html, body {
   height: 100vh;
   overflow: hidden; /* Prevent scrolling */
 }
+.order-details-submit-btn {
+  position: fixed; /* Fixed ensures it stays on the screen */
+  top: 16px; /* Distance from the top */
+  right: 16px; /* Distance from the right */
+  z-index: 1000; /* Ensure it stays on top */
+}
 
 /* Parent Grid Layout */
 .parent {
