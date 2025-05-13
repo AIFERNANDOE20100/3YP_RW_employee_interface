@@ -1,6 +1,10 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./video_feed_page.css";
-// import "./../components/video_feed_components/order_submit.css";
+import {
+  mqtt,
+  iot,
+  io,
+} from "aws-iot-device-sdk-v2";
 
 import VideoFeed from "../components/video_feed_components/video_feed.jsx";
 import OrderDetails from "../components/order_details_components/order_details.jsx";
@@ -8,63 +12,110 @@ import RobotStatus from "../components/robot_status_components/robot_status.jsx"
 import OrderSubmit from "../components/video_feed_components/order_submit.jsx";
 
 const VideoFeedPage = () => {
+  const [client, setClient] = useState(null);
+  const [connected, setConnected] = useState(false);
   const [keysPressed, setKeysPressed] = useState({});
   const [intervals, setIntervals] = useState({});
 
-  const sendKeyPress = (key) => {
-    fetch("http://localhost:5000/api/keyPress", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ key, action: "keydown" }),
-    })
-      .then((response) => response.json())
-      .then((data) => console.log("Server Response:", data))
-      .catch((error) => console.error("Error:", error));
+  useEffect(() => {
+    let connection = null;
+
+    const connectToAwsIoT = async () => {
+      const accessKey = localStorage.getItem("awsAccessKey");
+      const secretKey = localStorage.getItem("awsSecretKey");
+      const sessionToken = localStorage.getItem("awsSessionToken");
+      const region = localStorage.getItem("awsRegion");
+      const host = localStorage.getItem("awsHost");
+
+      if (!accessKey || !secretKey || !sessionToken || !region || !host) return;
+
+      const config = iot.AwsIotMqttConnectionConfigBuilder.new_with_websockets()
+        .with_clean_session(false)
+        .with_client_id("reactClient_" + Math.random().toString(16).substr(2, 8))
+        .with_endpoint(host)
+        .with_credentials(region, accessKey, secretKey, sessionToken)
+        .build();
+
+      const clientBootstrap = new io.ClientBootstrap();
+      const mqttClient = new mqtt.MqttClient(clientBootstrap);
+      connection = mqttClient.new_connection(config);
+
+      connection.on("connect", () => setConnected(true));
+      connection.on("disconnect", () => setConnected(false));
+      connection.on("error", () => setConnected(false));
+
+      try {
+        await connection.connect();
+        setClient(connection);
+      } catch (err) {
+        console.error("MQTT connection failed:", err);
+      }
+    };
+
+    connectToAwsIoT();
+
+    return () => {
+      if (connection) {
+        connection.disconnect();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      if (client) {
+        client.disconnect();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [client]);
+
+  const sendKeyPressToMQTT = (key, action) => {
+    if (!client || !connected) return;
+
+    const message = {
+      key,
+      action,
+      timestamp: new Date().toISOString(),
+      restaurantId: localStorage.getItem("restaurantId"),
+    };
+    const topic = localStorage.getItem("topic");
+    client.publish(topic.toString(), JSON.stringify(message), mqtt.QoS.AtLeastOnce);
   };
 
   const handleKeyPress = (event) => {
-    if (keysPressed[event.key]) return; // Prevent duplicate intervals
+    if (keysPressed[event.key]) return;
 
-    setKeysPressed((prevKeys) => ({
-      ...prevKeys,
-      [event.key]: true,
-    }));
+    setKeysPressed((prev) => ({ ...prev, [event.key]: true }));
+    sendKeyPressToMQTT(event.key, "keydown");
 
-    sendKeyPress(event.key); // Send the first key press immediately
+    const intervalId = setInterval(() => {
+      sendKeyPressToMQTT(event.key, "keydown");
+    }, 200);
 
-    const intervalId = setInterval(() => sendKeyPress(event.key), 200); // Send continuously every 200ms
-    setIntervals((prevIntervals) => ({
-      ...prevIntervals,
-      [event.key]: intervalId,
-    }));
+    setIntervals((prev) => ({ ...prev, [event.key]: intervalId }));
   };
 
   const handleKeyRelease = (event) => {
-    setKeysPressed((prevKeys) => {
-      const updatedKeys = { ...prevKeys };
-      delete updatedKeys[event.key];
-      return updatedKeys;
+    setKeysPressed((prev) => {
+      const updated = { ...prev };
+      delete updated[event.key];
+      return updated;
     });
 
-    clearInterval(intervals[event.key]); // Stop sending when key is released
-    setIntervals((prevIntervals) => {
-      const updatedIntervals = { ...prevIntervals };
-      delete updatedIntervals[event.key];
-      return updatedIntervals;
+    clearInterval(intervals[event.key]);
+
+    setIntervals((prev) => {
+      const updated = { ...prev };
+      delete updated[event.key];
+      return updated;
     });
 
-    fetch("http://localhost:3000/api/keyPress", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ key: event.key, action: "keyup" }),
-    })
-      .then((response) => response.json())
-      .then((data) => console.log("Server Response:", data))
-      .catch((error) => console.error("Error:", error));
+    sendKeyPressToMQTT(event.key, "keyup");
   };
 
   useEffect(() => {
@@ -74,9 +125,9 @@ const VideoFeedPage = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
       window.removeEventListener("keyup", handleKeyRelease);
-      Object.values(intervals).forEach(clearInterval); // Cleanup intervals on unmount
+      Object.values(intervals).forEach(clearInterval);
     };
-  }, [keysPressed, intervals]);
+  }, [client, connected, keysPressed, intervals]);
 
   return (
     <div className="parent">
