@@ -1,47 +1,76 @@
 import { useEffect, useRef, useState } from 'react';
 import './video_feed.css';
-import VideoButton  from './video_button.jsx';
+import VideoButton from './video_button.jsx';
 
 const VideoFeed = () => {
-  const videoRef = useRef(null);
+  const imgRef = useRef(null);
+  const socketRef = useRef(null);
   const [isStreaming, setIsStreaming] = useState(false);
 
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-      }
+  const startStream = () => {
+    console.log('[+] Starting video stream...');
+    socketRef.current = new WebSocket('ws://localhost:5000/video-stream'); // Your backend proxy endpoint
+
+    socketRef.current.onopen = () => {
+      console.log('[+] Connected to video stream');
       setIsStreaming(true);
-    } catch (error) {
-      console.error('Error accessing camera:', error);
-    }
+    };
+
+    socketRef.current.onmessage = (event) => {
+      console.log('[+] Received message from stream');
+      if (event.data) {
+        console.log('[+] Data packet:', event.data);  // Log raw packet
+
+        // Ensure it's a Blob, then create a URL for it
+        if (event.data instanceof Blob) {
+          const url = URL.createObjectURL(event.data); // Create a URL for the blob
+          console.log('[+] Blob URL:', url);
+
+          // Check if the imgRef is valid before updating the src
+          if (imgRef.current) {
+            imgRef.current.src = url;  // Set the src of the img tag to the URL
+          }
+
+          // Revoke the previous URL after a small delay to avoid memory leaks
+          setTimeout(() => URL.revokeObjectURL(url), 100);
+        }
+      } else {
+        console.warn('[!] Empty or invalid message received');
+      }
+    };
+
+    socketRef.current.onclose = () => {
+      console.log('[x] Video stream connection closed');
+      setIsStreaming(false);
+    };
+
+    socketRef.current.onerror = (err) => {
+      console.error('[!] WebSocket error:', err);
+      setIsStreaming(false);
+    };
   };
 
-  const stopCamera = () => {
-    if (videoRef.current && videoRef.current.srcObject) {
-      const stream = videoRef.current.srcObject;
-      const tracks = stream.getTracks();
-      tracks.forEach((track) => track.stop());
-      videoRef.current.srcObject = null;
+  const stopStream = () => {
+    if (socketRef.current) {
+      socketRef.current.close();
     }
     setIsStreaming(false);
   };
 
   useEffect(() => {
-    return () => stopCamera(); // Cleanup on unmount
+    return () => stopStream(); // Cleanup on unmount
   }, []);
 
   return (
     <div className="video-feed-container">
       <div className="video-wrapper">
-        <video ref={videoRef} autoPlay playsInline className="video" />
+        <img ref={imgRef} alt="Live Video Feed" className="video" />
       </div>
       <div className="controls">
         {!isStreaming ? (
-          <VideoButton onClick={startCamera} variant="default">Start Camera</VideoButton>
+          <VideoButton onClick={startStream} variant="default">Start Stream</VideoButton>
         ) : (
-          <VideoButton onClick={stopCamera} variant="destructive">Stop Camera</VideoButton>
+          <VideoButton onClick={stopStream} variant="destructive">Stop Stream</VideoButton>
         )}
       </div>
     </div>
