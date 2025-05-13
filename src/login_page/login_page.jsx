@@ -17,8 +17,25 @@ const Login = () => {
       const data = await loginUser(email, password);
       console.log("Login successful:", data);
 
-      // Save restaurantId to localStorage
+      // Save restaurantId and awsAccessKey to localStorage
       localStorage.setItem("restaurantId", data.user.restaurantId);
+      localStorage.setItem("awsAccessKey", data.user.awsAccessKey);
+      localStorage.setItem("awsSecretKey", data.user.awsSecretKey);
+      localStorage.setItem("awsSessionToken", data.user.awsSessionToken);  
+      localStorage.setItem("awsRegion", data.user.awsRegion);
+      localStorage.setItem("awsHost", data.user.awsHost);
+      localStorage.setItem("topic", data.user.topic);
+      //user: {
+      //   uid: localId,
+      //   email,
+      //   token: idToken,
+      //   restaurantId,
+      //   awsAccessKey: AWS.config.credentials.accessKeyId,
+      //   awsSecretKey: AWS.config.credentials.secretAccessKey,
+      //   awsSessionToken: AWS.config.credentials.sessionToken,
+      //   awsRegion: process.env.AWS_REGION,
+      //   awsHost: process.env.AWS_IOT_ENDPOINT,
+      // },
 
       setSuccessMessage("Login successful! Redirecting...");
 
