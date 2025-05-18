@@ -22,7 +22,7 @@
   .content {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 5px;
   }
   
   /* Text Styling */
@@ -30,10 +30,6 @@
     font-size: 12px;
     font-weight: 600;
     color: #333;
-  }
-
-  .customer-details,.order-no {
-    color: blueviolet;
   }
   
   /* Right Section (Button) Styling */
