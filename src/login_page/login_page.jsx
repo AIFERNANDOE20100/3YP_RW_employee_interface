@@ -19,6 +19,7 @@ const Login = () => {
 
       // Save restaurantId and awsAccessKey to localStorage
       localStorage.setItem("restaurantId", data.user.restaurantId);
+      localStorage.setItem("userId", data.user.uid);
       localStorage.setItem("awsAccessKey", data.user.awsAccessKey);
       localStorage.setItem("awsSecretKey", data.user.awsSecretKey);
       localStorage.setItem("awsSessionToken", data.user.awsSessionToken);  
@@ -82,9 +83,6 @@ const Login = () => {
       {successMessage && <div className="popup success">{successMessage}</div>}
       {errorMessage && <div className="popup error">{errorMessage}</div>}
 
-      <p className="signup-prompt">
-        Don't have an account? <a href="/signup">Sign up</a>
-      </p>
     </div>
   );
 };

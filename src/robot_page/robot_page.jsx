@@ -1,34 +1,63 @@
-import React from 'react';
-import './robot_page.css';
-import RobotCard from '../components/robot_profile_frame_components/robot_card.jsx';
+import React, { useEffect, useState } from "react";
+import "./robot_page.css";
+import RobotCard from "../components/robot_profile_frame_components/robot_card.jsx";
 import { useNavigate } from "react-router-dom";
-import Profile from '../components/profile/profile.jsx';
+import Profile from "../components/profile/profile.jsx";
+import axios from "axios";
 
-const RobotPage = ({ items }) => {
-    const navigate = useNavigate();
+const RobotPage = () => {
+  const navigate = useNavigate();
+  const [robots, setRobots] = useState([]);
+  const restaurantId = localStorage.getItem("restaurantId");
 
-    const handleCardClick = (name) => {
-        navigate("/videofeed");
+  useEffect(() => {
+    const fetchRobots = async () => {
+      try {
+        const res = await axios.get(`http://localhost:3000/api/restaurant/${restaurantId}/entities`);
+        const rawRobots = res.data.robots;
+        console.log("Fetched robots:", robots);
+        const enrichedRobots = rawRobots.map(robot => ({
+          robotId: robot.robotId,
+          name: robot.name,
+          status: "online",
+          description: "Delivery Robot",
+          
+        }));
+
+        setRobots(enrichedRobots);
+      } catch (err) {
+        console.error("Failed to fetch robots:", err);
+      }
     };
 
-    return (
-        <div className="robot-page-container">
-            {/* Move Profile to the top-right corner */}
-            <div className="profile-container">
-                <Profile />
-            </div>
+    fetchRobots();
+  }, [restaurantId]);
 
-            <div className="grid-container">
-                {items.map((item, index) => (
-                    <RobotCard
-                        key={index}
-                        {...item}
-                        onClick={() => handleCardClick(item.name)}
-                    />
-                ))}
-            </div>
-        </div>
-    );
+  const handleCardClick = (robotId) => {
+    localStorage.setItem("selectedRobotId", robotId);
+    navigate("/videofeed");
+  };
+
+  return (
+    <div className="robot-page-container">
+      <div className="profile-container">
+        <Profile />
+      </div>
+
+      <div className="grid-container">
+        {robots.map((robot) => (
+          <RobotCard
+            key={robot.robotId}
+            name={robot.name}
+            description={robot.description}
+            status={robot.status}
+            imageUrl={robot.imageUrl}
+            onClick={() => handleCardClick(robot.robotId)}
+          />
+        ))}
+      </div>
+    </div>
+  );
 };
 
 export default RobotPage;

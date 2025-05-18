@@ -1,4 +1,3 @@
-// OrderSubmit.jsx
 import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import "./order_submit.css";
@@ -14,6 +13,9 @@ const OrderSubmit = () => {
 
   const userId = localStorage.getItem("userId");
   const restaurantId = localStorage.getItem("restaurantId");
+  const robotId = localStorage.getItem("selectedRobotId");
+  console.log("Robot ID:", robotId);
+  console.log("Restaurant ID:", restaurantId);
 
   useEffect(() => {
     if (!restaurantId) return;
@@ -87,12 +89,14 @@ const OrderSubmit = () => {
     );
 
     try {
-      await axios.post("http://localhost:5000/api/orders", {
+      await axios.post("http://localhost:5000/api/orders/submitOrders", {
         tableNo,
         restaurantId,
         userId,
+        robotId,
         items: orderItems,
         totalQuantity,
+        status : "active",
       });
 
       alert("Order submitted!");
