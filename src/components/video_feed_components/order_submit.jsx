@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import api from "../services/api";
 import "./order_submit.css";
 
 const OrderSubmit = () => {
@@ -19,8 +19,8 @@ const OrderSubmit = () => {
 
   useEffect(() => {
     if (!restaurantId) return;
-    axios
-      .get(`http://localhost:5000/api/menu-items?restaurantId=${restaurantId}`)
+    api
+      .get(`/api/menu-items?restaurantId=${restaurantId}`)
       .then((res) => {
         const sortedItems = res.data.sort(
           (a, b) => a.menuNumber - b.menuNumber
@@ -89,7 +89,7 @@ const OrderSubmit = () => {
     );
 
     try {
-      await axios.post("http://localhost:5000/api/orders/submitOrders", {
+      await api.post("/api/orders/submitOrders", {
         tableNo,
         restaurantId,
         userId,

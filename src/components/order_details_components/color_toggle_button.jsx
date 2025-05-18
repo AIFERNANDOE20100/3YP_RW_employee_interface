@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../../services/api";
 import "./color_toggle_button.css";
 
 const ColorToggleButton = ({ orderId }) => {
@@ -10,7 +10,7 @@ const ColorToggleButton = ({ orderId }) => {
     if (disabled) return;
 
     try {
-      await axios.patch(`http://localhost:5000/api/orders/markCompleted/${orderId}`);
+      await api.patch(`/api/orders/markCompleted/${orderId}`);
       setIsGreen(false);
       setDisabled(true);
     } catch (err) {

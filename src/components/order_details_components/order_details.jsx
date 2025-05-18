@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import ContainerBox from "./details_display.jsx";
 import "./order_details.css";
-import axios from "axios";
+import api from "../../services/api";
 
 const OrderDetails = () => {
   const [orders, setOrders] = useState([]);
@@ -13,7 +13,7 @@ const OrderDetails = () => {
       if (!restaurantId) return;
 
       try {
-        const res = await axios.get(`http://localhost:5000/api/orders/getOrders?restaurantId=${restaurantId}&robotId=${robotId}`);
+        const res = await api.get(`/api/orders/getOrders?restaurantId=${restaurantId}&robotId=${robotId}`);
         setOrders(res.data);
       } catch (error) {
         console.error("Failed to fetch orders:", error);
