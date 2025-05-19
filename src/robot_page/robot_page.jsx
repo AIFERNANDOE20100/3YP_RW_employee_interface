@@ -3,7 +3,7 @@ import "./robot_page.css";
 import RobotCard from "../components/robot_profile_frame_components/robot_card.jsx";
 import { useNavigate } from "react-router-dom";
 import Profile from "../components/profile/profile.jsx";
-import axios from "axios";
+import api from "../services/api.js";
 
 const RobotPage = () => {
   const navigate = useNavigate();
@@ -13,15 +13,14 @@ const RobotPage = () => {
   useEffect(() => {
     const fetchRobots = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/restaurant/${restaurantId}/entities`);
+        const res = await api.get(`/api/${restaurantId}/robots`);
         const rawRobots = res.data.robots;
         console.log("Fetched robots:", robots);
         const enrichedRobots = rawRobots.map(robot => ({
           robotId: robot.robotId,
           name: robot.name,
           status: "online",
-          description: "Delivery Robot",
-          
+          description: "Delivery Robot"
         }));
 
         setRobots(enrichedRobots);
