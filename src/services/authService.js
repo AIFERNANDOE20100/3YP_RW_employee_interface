@@ -1,12 +1,10 @@
-import axios from "axios";
-
-const API_URL = "http://localhost:5000/api/auth"; // Backend API URL
+import api from "./api";
 
 export const signupUser = async (fullName, email, password) => {
   //
   try {
     console.log("Submitting signup details...");
-    const response = await axios.post(`${API_URL}/signup`, {
+    const response = await api.post(`/api/auth/signup`, {
       fullName,
       email,
       password,
@@ -28,13 +26,10 @@ export const signupUser = async (fullName, email, password) => {
   }
 };
 
-
 export const loginUser = async (email, password) => {
   try {
-    const response = await axios.post(`${API_URL}/login`, { email, password });
-
+    const response = await api.post(`/api/auth/login`, { email, password });
     console.log("Response from backend:", response.data);
-
     return response.data; // This contains the token & userId
   } catch (error) {
     console.error("Login error:", error);
