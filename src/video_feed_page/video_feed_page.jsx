@@ -78,13 +78,14 @@ const VideoFeedPage = () => {
     if (!client || !connected) return;
 
     const message = {
+      // status: "success",
       key,
-      action,
-      timestamp: new Date().toISOString(),
-      restaurantId: localStorage.getItem("restaurantId"),
+      // action,
+      // timestamp: new Date().toISOString(),
+      // restaurantId: localStorage.getItem("restaurantId"),
     };
     const topic = localStorage.getItem("topic");
-    client.publish(topic.toString(), JSON.stringify(message), mqtt.QoS.AtLeastOnce);
+    client.publish(topic.toString(), JSON.stringify(message), mqtt.QoS.AtMostOnce);
   };
 
   const handleKeyPress = (event) => {
