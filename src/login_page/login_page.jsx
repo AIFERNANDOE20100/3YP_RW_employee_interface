@@ -26,6 +26,7 @@ const Login = () => {
       localStorage.setItem("awsRegion", data.user.awsRegion);
       localStorage.setItem("awsHost", data.user.awsHost);
       localStorage.setItem("topic", data.user.topic);
+      localStorage.setItem("token", data.user.token);
       //user: {
       //   uid: localId,
       //   email,
