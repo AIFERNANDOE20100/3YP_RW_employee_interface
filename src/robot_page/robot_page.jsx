@@ -15,7 +15,6 @@ const RobotPage = () => {
       try {
         const res = await api.get(`/api/${restaurantId}/robots`);
         const rawRobots = res.data.robots;
-        console.log("Fetched robots:", robots);
         const enrichedRobots = rawRobots.map(robot => ({
           robotId: robot.robotId,
           name: robot.name,
