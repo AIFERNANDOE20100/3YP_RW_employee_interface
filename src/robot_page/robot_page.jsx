@@ -15,7 +15,6 @@ const RobotPage = () => {
       try {
         const res = await api.get(`/api/${restaurantId}/robots`);
         const rawRobots = res.data.robots;
-        console.log("Fetched robots:", robots);
         const enrichedRobots = rawRobots.map(robot => ({
           robotId: robot.robotId,
           name: robot.name,
@@ -32,9 +31,20 @@ const RobotPage = () => {
     fetchRobots();
   }, [restaurantId]);
 
-  const handleCardClick = (robotId) => {
-    localStorage.setItem("selectedRobotId", robotId);
-    navigate("/videofeed");
+  const handleCardClick = async (robotId) => {
+    const idToken = localStorage.getItem("token"); // assuming this is the Firebase ID token
+
+    try {
+      await api.get(`/api/${restaurantId}/robots/${robotId}`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+      localStorage.setItem("selectedRobotId", robotId);
+      navigate("/videofeed");
+    } catch (err) {
+      console.error("Failed to fetch robot details:", err);
+    }
   };
 
   return (
