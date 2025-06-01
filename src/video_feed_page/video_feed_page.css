@@ -53,6 +53,22 @@ html, body {
   object-fit: cover; /* Ensures video fills container */
 }
 
+.disconnect-button {
+position: fixed;
+top: 10px;
+left: 10px;
+background-color: #ff4d4d;
+color: white;
+padding: 8px 12px;
+border: none;
+border-radius: 6px;
+cursor: pointer;
+z-index: 9999; /* ensure it's above all other content */
+}
+
+.disconnect-button:hover {
+background-color: #cc0000;
+}
 /* Responsive Design */
 @media (max-width: 600px) {
   .parent {

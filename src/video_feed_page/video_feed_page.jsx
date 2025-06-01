@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./video_feed_page.css";
 import {
   mqtt,
@@ -16,6 +17,29 @@ const VideoFeedPage = () => {
   const [connected, setConnected] = useState(false);
   const [keysPressed, setKeysPressed] = useState({});
   const [intervals, setIntervals] = useState({});
+
+  const topic = localStorage.getItem("topic");
+
+  const sendMQTTMessage = (type) => {
+    if (client && connected && topic) {
+      const message = {
+        type,
+        timestamp: new Date().toISOString(),
+      };
+      client.publish(topic.toString(), JSON.stringify(message), mqtt.QoS.AtLeastOnce);
+    }
+  };
+  
+  const navigate = useNavigate();
+
+  const handleManualDisconnect = () => {
+    sendMQTTMessage("disconnect");
+    if (client) {
+      client.disconnect();
+    }
+    navigate(-1); // Go back to the previous page
+  };
+
 
   useEffect(() => {
     let connection = null;
@@ -40,7 +64,17 @@ const VideoFeedPage = () => {
       const mqttClient = new mqtt.MqttClient(clientBootstrap);
       connection = mqttClient.new_connection(config);
 
-      connection.on("connect", () => setConnected(true));
+      connection.on("connect", () => {
+        setConnected(true);
+
+        const sessionState = sessionStorage.getItem("visited");
+        if (sessionState) {
+          sendMQTTMessage("reconnect");
+        } else {
+          sessionStorage.setItem("visited", "true");
+        }
+      });
+
       connection.on("disconnect", () => setConnected(false));
       connection.on("error", () => setConnected(false));
 
@@ -62,9 +96,14 @@ const VideoFeedPage = () => {
   }, []);
 
   useEffect(() => {
-    const handleBeforeUnload = () => {
-      if (client) {
-        client.disconnect();
+    const handleBeforeUnload = (event) => {
+      const navType = performance.getEntriesByType("navigation")[0]?.type;
+      if (client && connected) {
+        if (navType === "reload") {
+          sendMQTTMessage("reconnect");
+        } else {
+          sendMQTTMessage("disconnect");
+        }
       }
     };
 
@@ -72,19 +111,14 @@ const VideoFeedPage = () => {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [client]);
+  }, [client, connected]);
 
   const sendKeyPressToMQTT = (key, action) => {
     if (!client || !connected) return;
 
     const message = {
-      // status: "success",
       key,
-      // action,
-      // timestamp: new Date().toISOString(),
-      // restaurantId: localStorage.getItem("restaurantId"),
     };
-    const topic = localStorage.getItem("topic");
     client.publish(topic.toString(), JSON.stringify(message), mqtt.QoS.AtMostOnce);
   };
 
@@ -134,6 +168,9 @@ const VideoFeedPage = () => {
     <div className="parent">
       <div className="order-details-submit-btn">
         <OrderSubmit />
+        <button onClick={handleManualDisconnect} className="disconnect-button">
+          Disconnect
+        </button>
       </div>
       <div className="large">
         <VideoFeed />
