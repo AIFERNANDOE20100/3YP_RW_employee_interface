@@ -56,7 +56,7 @@ const Login = () => {
 
   return (
     <div className="login-container">
-      <h2 className="form-title">WELCOME TO ROBOT WAITER! Please Log In</h2>
+      <h2 className="login-form-title">WELCOME TO ROBOT WAITER! Please Log In</h2>
 
       <form onSubmit={handleLogin} className="login-form">
         <input
