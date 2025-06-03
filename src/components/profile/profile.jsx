@@ -1,11 +1,13 @@
-// ProfileIcon.jsx
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, User, Settings, LogOut, Edit } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import api from "../../services/api.js";
 import "./profile.css";
 
 const Profile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -19,6 +21,27 @@ const Profile = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      const uid = localStorage.getItem("userId");
+      if (!uid) {
+        console.error("UID not found");
+        return;
+      }
+
+      // Call backend to revoke token
+      await api.post("/api/auth/logout", { uid });
+
+      // Clear all local user data
+      localStorage.clear();
+
+      // Redirect to login
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <div className="relative inline-block" ref={dropdownRef}>
@@ -44,7 +67,7 @@ const Profile = () => {
             <Settings size={18} />
             <span>Settings</span>
           </div>
-          <div className="dropdown-item signout">
+          <div className="dropdown-item signout" onClick={handleSignOut}>
             <LogOut size={18} />
             <span>Sign Out</span>
           </div>
