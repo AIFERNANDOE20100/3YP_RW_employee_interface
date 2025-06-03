@@ -12,8 +12,14 @@ const RobotPage = () => {
 
   useEffect(() => {
     const fetchRobots = async () => {
+      const idToken = localStorage.getItem("token"); // assuming this is the Firebase ID token
+
       try {
-        const res = await api.get(`/api/${restaurantId}/robots`);
+        const res = await api.get(`/api/${restaurantId}/robots`, {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
         const rawRobots = res.data.robots;
         const enrichedRobots = rawRobots.map(robot => ({
           robotId: robot.robotId,
