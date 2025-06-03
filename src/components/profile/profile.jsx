@@ -1,13 +1,40 @@
-// ProfileIcon.jsx
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, User, Settings, LogOut, Edit } from "lucide-react";
+import { signOut, getAuth } from "firebase/auth";
 import "./profile.css";
 
 const Profile = () => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const auth = getAuth();
 
   const toggleDropdown = () => setIsOpen(!isOpen);
+
+  const handleSignOut = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const idToken = await user.getIdToken();
+
+        // Notify backend to revoke tokens
+        await fetch("/api/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+      }
+
+      // Sign out from Firebase client
+      await signOut(auth);
+
+      // Redirect to login page
+      window.location.href = "/login";
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -44,7 +71,7 @@ const Profile = () => {
             <Settings size={18} />
             <span>Settings</span>
           </div>
-          <div className="dropdown-item signout">
+          <div className="dropdown-item signout" onClick={handleSignOut}>
             <LogOut size={18} />
             <span>Sign Out</span>
           </div>
