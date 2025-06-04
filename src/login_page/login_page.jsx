@@ -89,9 +89,16 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <a href="#" className="forgot-password-link">
-          Forgot password?
-        </a>
+      <a
+        href="#"
+        className="forgot-password-link"
+        onClick={(e) => {
+          e.preventDefault();
+          handleForgotPassword();
+        }}
+      >
+        Forgot password?
+      </a>
 
         <button type="submit" className="login-button">
           Log In
