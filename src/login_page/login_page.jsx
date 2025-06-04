@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../login_page/login_page.css";
-import { loginUser } from "../services/authService";
+import { loginUser, requestPasswordReset } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -51,6 +51,23 @@ const Login = () => {
       setTimeout(() => {
         setErrorMessage("");
       }, 3000);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setErrorMessage("Please enter your email address.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
+
+    try {
+      await requestPasswordReset(email);
+      setSuccessMessage("Password reset email sent. Check your inbox.");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setTimeout(() => setErrorMessage(""), 3000);
     }
   };
 

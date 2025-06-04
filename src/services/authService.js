@@ -1,5 +1,17 @@
 import api from "./api";
 
+export const requestPasswordReset = async (email) => {
+  const res = await fetch("/api/reset-password", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Failed to send reset email.");
+  return data;
+};
+
 export const signupUser = async (fullName, email, password) => {
   //
   try {
