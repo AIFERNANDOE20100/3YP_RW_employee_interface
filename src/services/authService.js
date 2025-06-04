@@ -1,15 +1,19 @@
 import api from "./api";
 
 export const requestPasswordReset = async (email) => {
-  const res = await fetch("/api/reset-password", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  });
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || "Failed to send reset email.");
-  return data;
+  try {
+    const response = await api.post("/api/auth/reset-password", { email });
+    return response.data;
+  } catch (error) {
+    console.error("Password reset error:", error);
+    if (error.response) {
+      throw error.response.data;
+    } else if (error.request) {
+      throw { message: "No response from server" };
+    } else {
+      throw { message: "Failed to send reset email" };
+    }
+  }
 };
 
 export const signupUser = async (fullName, email, password) => {
