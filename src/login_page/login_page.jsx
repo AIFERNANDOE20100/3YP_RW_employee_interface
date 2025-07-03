@@ -17,6 +17,8 @@ const Login = () => {
       const data = await loginUser(email, password);
       console.log("Login successful:", data);
 
+      console.log("tokennnnnn", data.user.token);
+
       // Save restaurantId and awsAccessKey to localStorage
       localStorage.setItem("restaurantId", data.user.restaurantId);
       localStorage.setItem("userId", data.user.uid);

@@ -10,8 +10,17 @@ const RobotStatus = () => {
 
   useEffect(() => {
     const fetchStatus = async () => {
+      const idToken = localStorage.getItem("token");
+      if (!idToken) {
+        console.error("No token found. Please log in.");
+        return;
+      }
       try {
-        const response = await api.get("/api/batteryStatus");
+        const response = await api.get("/api/batteryStatus", {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
         const data = response.data;
         console.log("Received data from backend:", data); // Debug log
         if (response.status === 200) {

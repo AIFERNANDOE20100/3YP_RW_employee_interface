@@ -19,8 +19,20 @@ const OrderSubmit = () => {
 
   useEffect(() => {
     if (!restaurantId) return;
+    const idToken = localStorage.getItem("token");
+    if (!idToken) {
+      console.error("No token found. Please log in.");
+      return;
+    }
     api
-      .get(`/api/menu-items?restaurantId=${restaurantId}`)
+      .get(
+        `/api/menu-items?restaurantId=${restaurantId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      )
       .then((res) => {
         const sortedItems = res.data.sort(
           (a, b) => a.menuNumber - b.menuNumber
@@ -88,16 +100,29 @@ const OrderSubmit = () => {
       0
     );
 
+    const idToken = localStorage.getItem("token");
+    if (!idToken) {
+      console.error("No token found. Please log in.");
+      return;
+    }
     try {
-      await api.post("/api/orders/submitOrders", {
-        tableNo,
-        restaurantId,
-        userId,
-        robotId,
-        items: orderItems,
-        totalQuantity,
-        status : "active",
-      });
+      await api.post(
+        "/api/orders/submitOrders",
+        {
+          tableNo,
+          restaurantId,
+          userId,
+          robotId,
+          items: orderItems,
+          totalQuantity,
+          status: "active",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
 
       alert("Order submitted!");
       setSelectedItems([]);
