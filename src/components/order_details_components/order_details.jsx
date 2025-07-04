@@ -6,33 +6,45 @@ import api from "../../services/api";
 const OrderDetails = () => {
   const [orders, setOrders] = useState([]);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      const restaurantId = localStorage.getItem("restaurantId");
-      const robotId = localStorage.getItem("selectedRobotId");
-      if (!restaurantId) return;
-      const idToken = localStorage.getItem("token");
-      if (!idToken) {
-        console.error("No token found. Please log in.");
-        return;
-      }
-      try {
-        const res = await api.get(
-          `/api/orders/getOrders?restaurantId=${restaurantId}&robotId=${robotId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${idToken}`,
-            },
-          }
-        );
-        setOrders(res.data);
-      } catch (error) {
-        console.error("Failed to fetch orders:", error);
-      }
-    };
+useEffect(() => {
+  const fetchOrders = async () => {
+    const restaurantId = localStorage.getItem("restaurantId");
+    const robotId = localStorage.getItem("selectedRobotId");
+    if (!restaurantId) return;
+    const idToken = localStorage.getItem("token");
+    if (!idToken) {
+      console.error("No token found. Please log in.");
+      return;
+    }
+    try {
+      const res = await api.get(
+        `/api/orders/getOrders?restaurantId=${restaurantId}&robotId=${robotId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
+      setOrders(res.data);
+    } catch (error) {
+      console.error("Failed to fetch orders:", error);
+    }
+  };
 
-    fetchOrders();
-  }, []);
+  // Initial fetch
+  fetchOrders();
+
+  // Event listener for order refresh
+  const handleOrderUpdate = () => {
+    fetchOrders(); // Call fetchOrders again when event is dispatched
+  };
+
+  window.addEventListener("order-submitted", handleOrderUpdate);
+
+  return () => {
+    window.removeEventListener("order-submitted", handleOrderUpdate);
+  };
+}, []);
 
   return (
     <div className="order-details-wrapper">
