@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react"; 
 import "./robot_page.css";
 import RobotCard from "../components/robot_profile_frame_components/robot_card.jsx";
 import { useNavigate } from "react-router-dom";
@@ -12,8 +12,18 @@ const RobotPage = () => {
 
   useEffect(() => {
     const fetchRobots = async () => {
+      const idToken = localStorage.getItem("token");
+      if (!idToken) {
+        console.error("No token found. Please log in.");
+        return;
+      }
       try {
-        const res = await api.get(`/api/${restaurantId}/robots`);
+        const res = await api.get(`/api/${restaurantId}/robots`, {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+        // console.log("Fetched robots:", res.data.robots);
         const rawRobots = res.data.robots;
         const enrichedRobots = rawRobots.map(robot => ({
           robotId: robot.robotId,
@@ -32,8 +42,11 @@ const RobotPage = () => {
   }, [restaurantId]);
 
   const handleCardClick = async (robotId) => {
-    const idToken = localStorage.getItem("token"); // assuming this is the Firebase ID token
-
+    const idToken = localStorage.getItem("token");
+    if (!idToken) {
+      console.error("No token found. Please log in.");
+      return;
+    }
     try {
       await api.get(`/api/${restaurantId}/robots/${robotId}`, {
         headers: {

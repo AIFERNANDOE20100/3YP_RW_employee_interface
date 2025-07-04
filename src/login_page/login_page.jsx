@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "../login_page/login_page.css";
-import { loginUser } from "../services/authService";
+import { loginUser, requestPasswordReset } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -16,6 +16,8 @@ const Login = () => {
     try {
       const data = await loginUser(email, password);
       console.log("Login successful:", data);
+
+      console.log("tokennnnnn", data.user.token);
 
       // Save restaurantId and awsAccessKey to localStorage
       localStorage.setItem("restaurantId", data.user.restaurantId);
@@ -54,9 +56,26 @@ const Login = () => {
     }
   };
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setErrorMessage("Please enter your email address.");
+      setTimeout(() => setErrorMessage(""), 3000);
+      return;
+    }
+
+    try {
+      await requestPasswordReset(email);
+      setSuccessMessage("Password reset email sent. Check your inbox.");
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      setErrorMessage(error.message);
+      setTimeout(() => setErrorMessage(""), 3000);
+    }
+  };
+
   return (
     <div className="login-container">
-      <h2 className="form-title">WELCOME TO ROBOT WAITER! Please Log In</h2>
+      <h2 className="login-form-title">WELCOME TO ROBOT WAITER! Please Log In</h2>
 
       <form onSubmit={handleLogin} className="login-form">
         <input
@@ -72,9 +91,16 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
 
-        <a href="#" className="forgot-password-link">
-          Forgot password?
-        </a>
+      <a
+        href="#"
+        className="forgot-password-link"
+        onClick={(e) => {
+          e.preventDefault();
+          handleForgotPassword();
+        }}
+      >
+        Forgot password?
+      </a>
 
         <button type="submit" className="login-button">
           Log In

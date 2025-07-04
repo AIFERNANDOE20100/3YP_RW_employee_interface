@@ -11,9 +11,20 @@ const OrderDetails = () => {
       const restaurantId = localStorage.getItem("restaurantId");
       const robotId = localStorage.getItem("selectedRobotId");
       if (!restaurantId) return;
-
+      const idToken = localStorage.getItem("token");
+      if (!idToken) {
+        console.error("No token found. Please log in.");
+        return;
+      }
       try {
-        const res = await api.get(`/api/orders/getOrders?restaurantId=${restaurantId}&robotId=${robotId}`);
+        const res = await api.get(
+          `/api/orders/getOrders?restaurantId=${restaurantId}&robotId=${robotId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          }
+        );
         setOrders(res.data);
       } catch (error) {
         console.error("Failed to fetch orders:", error);

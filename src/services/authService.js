@@ -1,5 +1,21 @@
 import api from "./api";
 
+export const requestPasswordReset = async (email) => {
+  try {
+    const response = await api.post("/api/auth/reset-password", { email });
+    return response.data;
+  } catch (error) {
+    console.error("Password reset error:", error);
+    if (error.response) {
+      throw error.response.data;
+    } else if (error.request) {
+      throw { message: "No response from server" };
+    } else {
+      throw { message: "Failed to send reset email" };
+    }
+  }
+};
+
 export const signupUser = async (fullName, email, password) => {
   //
   try {

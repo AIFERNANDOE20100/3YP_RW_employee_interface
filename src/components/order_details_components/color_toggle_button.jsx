@@ -8,9 +8,21 @@ const ColorToggleButton = ({ orderId }) => {
 
   const toggleColor = async () => {
     if (disabled) return;
-
+    const idToken = localStorage.getItem("token");
+    if (!idToken) {
+      console.error("No token found. Please log in.");
+      return;
+    }
     try {
-      await api.patch(`/api/orders/markCompleted/${orderId}`);
+      await api.patch(
+        `/api/orders/markCompleted/${orderId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
       setIsGreen(false);
       setDisabled(true);
     } catch (err) {
