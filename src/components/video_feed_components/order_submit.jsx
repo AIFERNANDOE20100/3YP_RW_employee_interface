@@ -106,30 +106,35 @@ const OrderSubmit = () => {
       return;
     }
     try {
-      await api.post(
-        "/api/orders/submitOrders",
-        {
-          tableNo,
-          restaurantId,
-          userId,
-          robotId,
-          items: orderItems,
-          totalQuantity,
-          status: "active",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
+        await api.post(
+    "/api/orders/submitOrders",
+    {
+      tableNo,
+      restaurantId,
+      userId,
+      robotId,
+      items: orderItems,
+      totalQuantity,
+      status: "active",
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${idToken}`,
+      },
+    }
+  );
 
-      alert("Order submitted!");
-      setSelectedItems([]);
-      setItemDetails({});
-      setItemQuantities({});
-      setTableNo("");
-      setIsOpen(false);
+  // Dispatch event to refresh orders
+  window.dispatchEvent(new Event("order-submitted"));
+
+  // Clear form state
+  alert("Order submitted!");
+  setSelectedItems([]);
+  setItemDetails({});
+  setItemQuantities({});
+  setTableNo("");
+  setIsOpen(false);
+
     } catch (err) {
       console.error("Failed to submit order:", err);
       alert("Failed to submit order");

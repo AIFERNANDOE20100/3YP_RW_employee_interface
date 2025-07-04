@@ -1,5 +1,5 @@
 import React from "react";
-import ColorToggleButton from "./color_toggle_button.jsx";
+import TickButton from "./tick_button.jsx";
 import "./details_display.css";
 
 const ContainerBox = ({ tableNo, orderNumber, itemNames, orderId }) => {
@@ -11,13 +11,13 @@ const ContainerBox = ({ tableNo, orderNumber, itemNames, orderId }) => {
         </p>
         <p className="label">
           Table No: <span className="table-no">{tableNo}</span>
-        </p> 
+        </p>
         <p className="label">
           Items: <span className="item-names">{itemNames}</span>
         </p>
       </div>
       <div className="button-container">
-        <ColorToggleButton orderId={orderId} />
+        <TickButton orderId={orderId} />
       </div>
     </div>
   );
