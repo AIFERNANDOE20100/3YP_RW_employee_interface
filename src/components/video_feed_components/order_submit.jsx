@@ -144,7 +144,7 @@ const OrderSubmit = () => {
   return (
     <div className="order-wrapper" ref={dropdownRef}>
       <button onClick={toggleDropdown} className="food-btn">
-        <img src="src/assets/food_icon.jpg" alt="food" className="food-img" />
+        <img src="https://img.icons8.com/?size=96&id=l5ePmGJDOLZ2&format=png" alt="food" className="food-img" />
       </button>
 
       {isOpen && (
