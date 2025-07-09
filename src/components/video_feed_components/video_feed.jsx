@@ -40,6 +40,7 @@ const servers = {
 
 const VideoFeed = ({ mqttClient, mqttTopic }) => {
   const remoteVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null); // <-- added
   const [isCalling, setIsCalling] = useState(false);
   const pcRef = useRef(null);
 
@@ -61,8 +62,15 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
     };
 
     pc.ontrack = (event) => {
-      if (remoteVideoRef.current && event.streams[0]) {
-        remoteVideoRef.current.srcObject = event.streams[0];
+      const stream = event.streams[0];
+      if (!stream) return;
+
+      if (event.track.kind === 'video' && remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = stream;
+      }
+
+      if (event.track.kind === 'audio' && remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = stream;
       }
     };
 
@@ -107,6 +115,9 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = null;
     }
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = null;
+    }
     if (mqttClient && mqttTopic) {
       mqttClient.publish(mqttTopic.toString(), JSON.stringify({ type: "videocall_off" }), 1);
     }
@@ -119,6 +130,7 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
     <div className="video-feed-container">
       <div className="video-wrapper">
         <video ref={remoteVideoRef} autoPlay playsInline className="video" />
+        <audio ref={remoteAudioRef} autoPlay playsInline /> {/* <-- added */}
       </div>
       <div className="controls">
         {!isCalling ? (
