@@ -1,45 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { BatteryFull, Activity } from "lucide-react";
 import "./robot_status.css";
-import api from "../../services/api";
 
-const RobotStatus = () => {
-  // State to hold battery and performance data
-  const [batteryPercentage, setBatteryPercentage] = useState(null);
-  const [performanceStatus, setPerformanceStatus] = useState(null);
-
-  useEffect(() => {
-    const fetchStatus = async () => {
-      const idToken = localStorage.getItem("token");
-      if (!idToken) {
-        console.error("No token found. Please log in.");
-        return;
-      }
-      try {
-        const response = await api.get("/api/batteryStatus", {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        });
-        const data = response.data;
-        console.log("Received data from backend:", data); // Debug log
-        if (response.status === 200) {
-          setBatteryPercentage(data.batteryPercentage);
-          setPerformanceStatus(data.performanceStatus);
-        } else {
-          console.error(data.message);
-        }
-      } catch (error) {
-        console.error("Error fetching battery status:", error);
-      }
-    };
-
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 5000); // Fetch every 5s
-
-    return () => clearInterval(interval); // Cleanup on unmount
-  }, []);
-
+const RobotStatus = ({ batteryPercentage }) => {
   return (
     <div className="robot-status-container">
       <h2 className="title">Robot Status</h2>
@@ -52,12 +15,10 @@ const RobotStatus = () => {
         </span>
       </div>
 
-      {/* Performance Section */}
+      {/* Performance Section (optional: static or future MQTT-based) */}
       <div className="status-row">
         <Activity className="icon" />
-        <span className="performanceStatus">
-          {performanceStatus !== null ? `${performanceStatus}%` : "Loading..."}
-        </span>
+        <span className="performanceStatus">Live</span>
       </div>
     </div>
   );
