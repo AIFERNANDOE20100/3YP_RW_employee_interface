@@ -1,0 +1,251 @@
+/* Modern UI/UX Background Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  min-height: 100vh;
+}
+
+.app-container {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #533483 75%, #7209b7 100%);
+  background-size: 300% 300%;
+  animation: gradientShift 15s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Floating Elements */
+.floating-elements {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.floating-circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  animation: float 20s infinite linear;
+}
+
+.floating-circle:nth-child(1) {
+  width: 80px;
+  height: 80px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.floating-circle:nth-child(2) {
+  width: 120px;
+  height: 120px;
+  top: 60%;
+  left: 80%;
+  animation-delay: -5s;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.floating-circle:nth-child(3) {
+  width: 100px;
+  height: 100px;
+  top: 80%;
+  left: 20%;
+  animation-delay: -10s;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.floating-circle:nth-child(4) {
+  width: 60px;
+  height: 60px;
+  top: 30%;
+  left: 70%;
+  animation-delay: -15s;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.floating-circle:nth-child(5) {
+  width: 90px;
+  height: 90px;
+  top: 10%;
+  left: 50%;
+  animation-delay: -8s;
+  background: rgba(255, 255, 255, 0.14);
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(-100px) rotate(180deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0px) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+/* Glassmorphism Effects */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Main Content Container */
+.main-content {
+  position: relative;
+  z-index: 2;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+/* Page Animations */
+.page-enter {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: pageEnter 0.6s ease-out forwards;
+}
+
+@keyframes pageEnter {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Modern Button Styles */
+.modern-btn {
+  background: linear-gradient(45deg, #0f3460, #533483);
+  border: none;
+  border-radius: 50px;
+  color: white;
+  padding: 12px 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(15, 52, 96, 0.4);
+}
+
+.modern-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(114, 9, 183, 0.6);
+}
+
+/* Modern Card Styles */
+.modern-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 30px;
+  margin: 20px 0;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+}
+
+.modern-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Input Styles */
+.modern-input {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 15px;
+  padding: 15px 20px;
+  color: white;
+  font-size: 16px;
+  width: 100%;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.modern-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.modern-input:focus {
+  outline: none;
+  border-color: rgba(114, 9, 183, 0.5);
+  box-shadow: 0 0 20px rgba(114, 9, 183, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .floating-circle {
+    display: none;
+  }
+  
+  .main-content {
+    padding: 10px;
+  }
+  
+  .modern-card {
+    padding: 20px;
+    margin: 10px 0;
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(114, 9, 183, 0.5);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(114, 9, 183, 0.8);
+}
+
+/* Text Styling */
+.modern-text {
+  color: white;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.modern-heading {
+  background: linear-gradient(45deg, #fff, #f0f0f0);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 30px;
+}

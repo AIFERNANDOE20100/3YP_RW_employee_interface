@@ -7,7 +7,7 @@
 /* Profile Container - Precisely in Top-Right Corner */
 .profile-container {
   position: fixed; /* Fixed ensures it stays on the screen */
-  top: 16px; /* Distance from the top */
+  /* top: 16px; Distance from the top */
   right: 16px; /* Distance from the right */
   z-index: 1000; /* Ensure it stays on top */
 }
@@ -18,7 +18,7 @@
   grid-template-columns: repeat(4, 1fr); /* Always 4 grids per row */
   gap: 16px;
   padding: 16px;
-  margin-top: 64px; /* Avoid overlap with profile icon */
+  /* margin-top: 30px;  */
 }
 
 /* Robot card styling */
