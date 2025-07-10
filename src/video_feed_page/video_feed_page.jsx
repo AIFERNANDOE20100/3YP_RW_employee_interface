@@ -190,11 +190,13 @@ const VideoFeedPage = () => {
 
   return (
     <div className="parent">
-      <div className="order-details-submit-btn">
-        <OrderSubmit />
+      <div className="disconnect-top-left">
         <button onClick={handleManualDisconnect} className="disconnect-button">
           Disconnect
         </button>
+      </div>
+      <div className="submit-top-right">
+        <OrderSubmit />
       </div>
       <div className="large">
         <VideoFeed mqttClient={client} mqttTopic={topic} />
