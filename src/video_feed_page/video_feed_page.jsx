@@ -18,6 +18,8 @@ const VideoFeedPage = () => {
   const [connected, setConnected] = useState(false);
   const [keysPressed, setKeysPressed] = useState({});
   const [intervals, setIntervals] = useState({});
+  const [battery, setBattery] = useState(null);
+
 
   const topic = localStorage.getItem("topic");
 
@@ -65,16 +67,33 @@ const VideoFeedPage = () => {
       const mqttClient = new mqtt.MqttClient(clientBootstrap);
       connection = mqttClient.new_connection(config);
 
-      connection.on("connect", () => {
-        setConnected(true);
+      connection.on("connect", async () => {
+          setConnected(true);
 
-        const sessionState = sessionStorage.getItem("visited");
-        if (sessionState) {
-          sendMQTTMessage("reconnect");
-        } else {
-          sessionStorage.setItem("visited", "true");
-        }
-      });
+          const sessionState = sessionStorage.getItem("visited");
+          if (sessionState) {
+            sendMQTTMessage("reconnect");
+          } else {
+            sessionStorage.setItem("visited", "true");
+          }
+
+          // Subscribe to the topic and handle all types of messages
+          await connection.subscribe(topic, mqtt.QoS.AtMostOnce, (topic, payload) => {
+            try {
+              const message = JSON.parse(new TextDecoder().decode(payload));
+              console.log("📩 MQTT Message Received:", message);
+
+              // Battery percentage update
+              if ("battery_percentage" in message) {
+                setBattery(message.battery_percentage);
+              }
+
+              // You can handle other types like control, alerts, etc., here too
+            } catch (err) {
+              console.error("❌ Failed to parse MQTT message:", err);
+            }
+          });
+        });
 
       connection.on("disconnect", () => setConnected(false));
       connection.on("error", () => setConnected(false));
@@ -122,6 +141,10 @@ const VideoFeedPage = () => {
     };
     client.publish(topic.toString(), JSON.stringify(message), mqtt.QoS.AtMostOnce);
   };
+
+  
+
+
 
   const handleKeyPress = (event) => {
     if (keysPressed[event.key]) return;
@@ -180,10 +203,9 @@ const VideoFeedPage = () => {
         <OrderDetails />
       </div>
       <div className="small">
-        <RobotStatus />
+        <RobotStatus batteryPercentage={battery} />
       </div>
     </div>
   );
 };
-
 export default VideoFeedPage;
