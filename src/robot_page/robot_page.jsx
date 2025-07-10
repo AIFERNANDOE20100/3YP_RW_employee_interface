@@ -65,7 +65,6 @@ const RobotPage = () => {
       <div className="profile-container">
         <Profile />
       </div>
-
       <div className="grid-container">
         {robots.map((robot) => (
           <RobotCard

@@ -1,24 +1,38 @@
 /* Robot Page Container */
 .robot-page-container {
   position: relative;
-  min-height: 100vh; /* Ensure full page height */
+  min-height: 100vh;
+  padding-top: 100px; /* reserve space under the fixed profile */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Profile Container - Precisely in Top-Right Corner */
+/* Profile Container - Fixed at Top Right */
 .profile-container {
-  position: fixed; /* Fixed ensures it stays on the screen */
-  /* top: 16px; Distance from the top */
-  right: 16px; /* Distance from the right */
-  z-index: 1000; /* Ensure it stays on top */
+  position: fixed;
+  top: 10px;
+  right: 15px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* padding: 1rem 1.2rem; */
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.profile-container:hover {
+  transform: translateY(-2px);
 }
 
 /* Grid container for robot cards */
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* Always 4 grids per row */
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
   padding: 16px;
-  /* margin-top: 30px;  */
 }
 
 /* Robot card styling */
@@ -30,36 +44,42 @@
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 12px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   cursor: pointer;
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .robot-card:hover {
-  transform: translateY(-5px); /* Hover animation */
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive Design */
 @media (max-width: 1024px) {
   .grid-container {
-      grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (max-width: 768px) {
   .grid-container {
-      grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 480px) {
   .grid-container {
-      grid-template-columns: repeat(1, 1fr);
+    grid-template-columns: repeat(1, 1fr);
   }
 
   .profile-container {
-      top: 8px; /* Adjust position for smaller screens */
-      right: 8px;
+    top: 8px;
+    right: 8px;
+    padding: 0.8rem 1rem;
+  }
+
+  .robot-page-container {
+    padding-top: 120px; /* slightly more space on small screens */
   }
 }
