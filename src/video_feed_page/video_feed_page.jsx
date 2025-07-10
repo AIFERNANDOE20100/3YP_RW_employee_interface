@@ -1,3 +1,4 @@
+// video_feed_page.jsx
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./video_feed_page.css";
@@ -173,7 +174,7 @@ const VideoFeedPage = () => {
         </button>
       </div>
       <div className="large">
-        <VideoFeed />
+        <VideoFeed mqttClient={client} mqttTopic={topic} />
       </div>
       <div className="small">
         <OrderDetails />

@@ -1,76 +1,142 @@
+// --- Updated video_feed.jsx ---
 import { useEffect, useRef, useState } from 'react';
 import './video_feed.css';
 import VideoButton from './video_button.jsx';
+import { initializeApp, getApps } from 'firebase/app';
+import { getFirestore, collection, doc, setDoc, onSnapshot, addDoc } from 'firebase/firestore';
 
-const VideoFeed = () => {
-  const imgRef = useRef(null);
-  const socketRef = useRef(null);
-  const [isStreaming, setIsStreaming] = useState(false);
+const firebaseConfig = {
+  apiKey: "AIzaSyBubdSfljjucCKUUwEwh15EtZFLywbsGEQ",
+  authDomain: "test-webrtc-f155e.firebaseapp.com",
+  projectId: "test-webrtc-f155e",
+  storageBucket: "test-webrtc-f155e.appspot.com",
+  messagingSenderId: "674163171327",
+  appId: "1:674163171327:web:c8f988f1605a01bd9291ca",
+  measurementId: "G-VV8L1PP7GZ"
+};
 
-  const startStream = () => {
-    console.log('[+] Starting video stream...');
-    socketRef.current = new WebSocket('ws://localhost:5000/video-stream'); // Your backend proxy endpoint
+if (!getApps().length) {
+  initializeApp(firebaseConfig);
+}
+const firestore = getFirestore();
 
-    socketRef.current.onopen = () => {
-      console.log('[+] Connected to video stream');
-      setIsStreaming(true);
-    };
+const servers = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    {
+      urls: 'turn:relay.metered.ca:80',
+      username: 'openai',
+      credential: 'openai'
+    },
+    {
+      urls: 'turn:relay.metered.ca:443',
+      username: 'openai',
+      credential: 'openai'
+    }
+  ],
+  iceCandidatePoolSize: 10,
+};
 
-    socketRef.current.onmessage = (event) => {
-      console.log('[+] Received message from stream');
-      if (event.data) {
-        console.log('[+] Data packet:', event.data);  // Log raw packet
+const VideoFeed = ({ mqttClient, mqttTopic }) => {
+  const remoteVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null); // <-- added
+  const [isCalling, setIsCalling] = useState(false);
+  const pcRef = useRef(null);
 
-        // Ensure it's a Blob, then create a URL for it
-        if (event.data instanceof Blob) {
-          const url = URL.createObjectURL(event.data); // Create a URL for the blob
-          console.log('[+] Blob URL:', url);
+  const startCall = async () => {
+    const pc = new RTCPeerConnection(servers);
+    pcRef.current = pc;
 
-          // Check if the imgRef is valid before updating the src
-          if (imgRef.current) {
-            imgRef.current.src = url;  // Set the src of the img tag to the URL
-          }
+    pc.addTransceiver('video', { direction: 'recvonly' });
+    pc.addTransceiver('audio', { direction: 'recvonly' });
 
-          // Revoke the previous URL after a small delay to avoid memory leaks
-          setTimeout(() => URL.revokeObjectURL(url), 100);
-        }
-      } else {
-        console.warn('[!] Empty or invalid message received');
+    const callDocRef = doc(collection(firestore, 'calls'));
+    const offerCandidatesCol = collection(callDocRef, 'offerCandidates');
+    const answerCandidatesCol = collection(callDocRef, 'answerCandidates');
+
+    pc.onicecandidate = event => {
+      if (event.candidate) {
+        addDoc(offerCandidatesCol, event.candidate.toJSON());
       }
     };
 
-    socketRef.current.onclose = () => {
-      console.log('[x] Video stream connection closed');
-      setIsStreaming(false);
+    pc.ontrack = (event) => {
+      const stream = event.streams[0];
+      if (!stream) return;
+
+      if (event.track.kind === 'video' && remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = stream;
+      }
+
+      if (event.track.kind === 'audio' && remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = stream;
+      }
     };
 
-    socketRef.current.onerror = (err) => {
-      console.error('[!] WebSocket error:', err);
-      setIsStreaming(false);
-    };
-  };
+    const offerDescription = await pc.createOffer();
+    await pc.setLocalDescription(offerDescription);
 
-  const stopStream = () => {
-    if (socketRef.current) {
-      socketRef.current.close();
+    const offer = {
+      sdp: offerDescription.sdp,
+      type: offerDescription.type,
+    };
+
+    await setDoc(callDocRef, { offer });
+
+    onSnapshot(callDocRef, snapshot => {
+      const data = snapshot.data();
+      if (!pc.currentRemoteDescription && data?.answer) {
+        pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+      }
+    });
+
+    onSnapshot(answerCandidatesCol, snapshot => {
+      snapshot.docChanges().forEach(change => {
+        if (change.type === 'added') {
+          const candidate = new RTCIceCandidate(change.doc.data());
+          pc.addIceCandidate(candidate);
+        }
+      });
+    });
+
+    if (mqttClient && mqttTopic) {
+      mqttClient.publish(mqttTopic.toString(), JSON.stringify({ type: "videocall_on", callId: callDocRef.id }), 1);
     }
-    setIsStreaming(false);
+
+    setIsCalling(true);
   };
 
-  useEffect(() => {
-    return () => stopStream(); // Cleanup on unmount
-  }, []);
+  const endCall = () => {
+    if (pcRef.current) {
+      pcRef.current.close();
+      pcRef.current = null;
+    }
+    if (remoteVideoRef.current) {
+      remoteVideoRef.current.srcObject = null;
+    }
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.srcObject = null;
+    }
+    if (mqttClient && mqttTopic) {
+      mqttClient.publish(mqttTopic.toString(), JSON.stringify({ type: "videocall_off" }), 1);
+    }
+    setIsCalling(false);
+  };
+
+  useEffect(() => () => endCall(), []);
 
   return (
     <div className="video-feed-container">
       <div className="video-wrapper">
-        <img ref={imgRef} alt="Live Video Feed" className="video" />
+        <video ref={remoteVideoRef} autoPlay playsInline className="video" />
+        <audio ref={remoteAudioRef} autoPlay playsInline /> {/* <-- added */}
       </div>
       <div className="controls">
-        {!isStreaming ? (
-          <VideoButton onClick={startStream} variant="default">Start Stream</VideoButton>
+        {!isCalling ? (
+          <VideoButton onClick={startCall} variant="default">Start Video Call</VideoButton>
         ) : (
-          <VideoButton onClick={stopStream} variant="destructive">Stop Stream</VideoButton>
+          <VideoButton onClick={endCall} variant="destructive">End Call</VideoButton>
         )}
       </div>
     </div>
