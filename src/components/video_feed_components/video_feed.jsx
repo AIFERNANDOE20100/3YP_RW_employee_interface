@@ -49,7 +49,7 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
     pcRef.current = pc;
 
     pc.addTransceiver('video', { direction: 'recvonly' });
-    pc.addTransceiver('audio', { direction: 'recvonly' });
+    pc.addTransceiver('audio', { direction: 'sendrecv' });
 
     const callDocRef = doc(collection(firestore, 'calls'));
     const offerCandidatesCol = collection(callDocRef, 'offerCandidates');
@@ -73,6 +73,9 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
         remoteAudioRef.current.srcObject = stream;
       }
     };
+    
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getAudioTracks().forEach(track => pc.addTrack(track, stream));
 
     const offerDescription = await pc.createOffer();
     await pc.setLocalDescription(offerDescription);
