@@ -128,9 +128,11 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
 
   return (
     <div className="video-feed-container">
-      <div className="video-wrapper">
-        <video ref={remoteVideoRef} autoPlay playsInline className="video" />
-        <audio ref={remoteAudioRef} autoPlay playsInline />
+      <div className="grid-item video-box">
+        <div className="video-wrapper">
+          <video ref={remoteVideoRef} autoPlay playsInline className="video" />
+          <audio ref={remoteAudioRef} autoPlay playsInline />
+        </div>
       </div>
       <div className="controls">
         {!isCalling ? (
