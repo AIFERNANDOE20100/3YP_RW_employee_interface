@@ -133,7 +133,7 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
     <div className="video-feed-container">
       <div className="video-wrapper">
         <video ref={remoteVideoRef} autoPlay playsInline className="video" />
-        <audio ref={remoteAudioRef} autoPlay playsInline /> {/* <-- added */}
+        <audio ref={remoteAudioRef} autoPlay playsInline />
       </div>
       <div className="controls">
         {!isCalling ? (

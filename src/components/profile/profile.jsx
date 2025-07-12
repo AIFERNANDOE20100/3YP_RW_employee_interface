@@ -47,7 +47,7 @@ const Profile = () => {
     <div className="relative inline-block" ref={dropdownRef}>
       <button onClick={toggleDropdown} className="profile-btn">
         <img
-          src="https://img.icons8.com/?size=96&id=13042&format=png"
+          src="https://img.icons8.com/?size=96&id=23242&format=png"
           alt="Profile"
           className="profile-img"
         />
