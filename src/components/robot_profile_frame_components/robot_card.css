@@ -20,9 +20,37 @@
   text-align: center;
   color: #ffffff;
   cursor: pointer;
-  border: none;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Header containing name and status dot */
+.robot-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Dot to show status */
+.status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: gray;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Optional image styling */
+.robot-image {
+  max-width: 100px;
+  height: auto;
+  margin: 10px auto;
+  border-radius: 8px;
 }
 
 .robot-card:hover {

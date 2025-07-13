@@ -28,7 +28,7 @@ const RobotPage = () => {
         const enrichedRobots = rawRobots.map(robot => ({
           robotId: robot.robotId,
           name: robot.name,
-          status: "online",
+          status: robot.status,
           description: "Delivery Robot"
         }));
 
@@ -41,12 +41,15 @@ const RobotPage = () => {
     fetchRobots();
   }, [restaurantId]);
 
-  const handleCardClick = async (robotId) => {
+  const handleCardClick = async (robotId, status) => {
+    if (status !== "available") return;
+
     const idToken = localStorage.getItem("token");
     if (!idToken) {
       console.error("No token found. Please log in.");
       return;
     }
+
     try {
       await api.get(`/api/${restaurantId}/robots/${robotId}`, {
         headers: {
@@ -73,7 +76,7 @@ const RobotPage = () => {
             description={robot.description}
             status={robot.status}
             imageUrl={robot.imageUrl}
-            onClick={() => handleCardClick(robot.robotId)}
+            onClick={() => handleCardClick(robot.robotId, robot.status)}
           />
         ))}
       </div>
