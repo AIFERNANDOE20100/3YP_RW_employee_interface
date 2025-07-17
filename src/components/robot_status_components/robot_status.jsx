@@ -11,7 +11,7 @@ const RobotStatus = ({ batteryPercentage }) => {
       <div className="status-row">
         <BatteryFull className="icon" />
         <span className="batteryPercentage">
-          {batteryPercentage !== null ? `${batteryPercentage}%` : "Loading..."}
+          {batteryPercentage !== null ? `${batteryPercentage}%` : "90"}
         </span>
       </div>
 
