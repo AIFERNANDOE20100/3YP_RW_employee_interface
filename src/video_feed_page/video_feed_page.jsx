@@ -138,6 +138,8 @@ const VideoFeedPage = () => {
 
     const message = {
       key,
+      timestamp: Date.now(), 
+      duration: 0.3,
     };
     client.publish(topic.toString(), JSON.stringify(message), mqtt.QoS.AtMostOnce);
   };

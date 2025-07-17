@@ -1,4 +1,3 @@
-// --- Updated video_feed.jsx ---
 import { useEffect, useRef, useState } from 'react';
 import './video_feed.css';
 import VideoButton from './video_button.jsx';
@@ -51,15 +50,127 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
   const canvasRef = useRef(null);
   const animationFrameRef = useRef(null);
 
-  // New refs for managing command processing
+  // Refs for managing command processing
   const currentCommandsToProcessRef = useRef([]); // The list of commands from the *current* message
   const commandIndexRef = useRef(0); // Index for the current command being processed
   const isProcessingCommandsRef = useRef(false); // Flag to indicate if command publishing is active
   const commandTimeoutRef = useRef(null); // Timeout ID for the delay between commands
 
+  // New refs for video freeze detection
+  const lastFramesReceivedRef = useRef(0);
+  const lastVideoStatsTimestampRef = useRef(0);
+  const videoFrozenDetectedRef = useRef(false);
+  const statsIntervalIdRef = useRef(null); // To store the setInterval ID
+
   // Define target FPS and calculate interval
   const TARGET_FPS = 5;
   const FRAME_INTERVAL = 1000 / TARGET_FPS; // Milliseconds per frame
+
+  // Function to stop command processing and reset state
+  const stopProcessingCommands = () => {
+    if (commandTimeoutRef.current) {
+      clearTimeout(commandTimeoutRef.current);
+      commandTimeoutRef.current = null;
+    }
+    isProcessingCommandsRef.current = false;
+    currentCommandsToProcessRef.current = [];
+    commandIndexRef.current = 0;
+    console.log("Command processing stopped.");
+    // Optionally send a 'STOP' command to the robot if it's not already handled by the ArUco server
+    // if (mqttClient && mqttTopic) {
+    //   mqttClient.publish(mqttTopic.toString(), JSON.stringify({ key: "STOP", timestamp: Date.now(), duration: 0.1 }), 1);
+    // }
+  };
+
+  // New function to start processing a fresh set of commands
+  const startProcessingNewCommands = (commands) => {
+    // Clear any existing processing
+    if (commandTimeoutRef.current) { 
+      clearTimeout(commandTimeoutRef.current);
+    }
+    isProcessingCommandsRef.current = true;
+    currentCommandsToProcessRef.current = commands;
+    commandIndexRef.current = 0;
+    processNextCommand(); // Start processing the new set
+  };
+
+  // Function to process the next command in the current list
+  const processNextCommand = () => {
+    if (!mqttClient || !mqttTopic) {
+        console.warn("MQTT client or topic not available for command publishing.");
+        stopProcessingCommands();
+        return;
+    }
+
+    while (commandIndexRef.current < currentCommandsToProcessRef.current.length) {
+      const command = currentCommandsToProcessRef.current[commandIndexRef.current];
+      console.log(`Processing command: ${command}`);
+      console.log(`Publishing command to MQTT: ${command}`);
+      mqttClient.publish(mqttTopic.toString(), JSON.stringify({ key: command, timestamp: Date.now(), duration: 0.1 }), 1);
+
+      commandIndexRef.current += 1;
+      // Schedule the next command after a 1.5-second delay
+      commandTimeoutRef.current = setTimeout(processNextCommand, 5000);
+    }
+      // All commands in the current set have been published
+    stopProcessingCommands();
+  };
+
+  // Function to check for video stream freeze
+  const checkVideoFreeze = async () => {
+    if (!pcRef.current || pcRef.current.connectionState !== 'connected') {
+      // If peer connection is not active, no need to check for freeze
+      return;
+    }
+
+    try {
+      const statsReport = await pcRef.current.getStats(null); // Get stats for the entire connection
+      let currentFramesReceived = 0;
+      let currentTimestamp = 0;
+
+      statsReport.forEach(report => {
+        // Look for inbound video RTP stream statistics
+        if (report.type === 'inbound-rtp' && report.kind === 'video') {
+          currentFramesReceived = report.framesReceived;
+          currentTimestamp = report.timestamp; // Timestamp of when the report was generated
+        }
+      });
+
+      // Check if frames received count has not increased over a threshold duration
+      const FREEZE_THRESHOLD_MS = 3000; // 3 seconds
+
+      if (lastFramesReceivedRef.current > 0 && 
+          currentFramesReceived === lastFramesReceivedRef.current && 
+          (currentTimestamp - lastVideoStatsTimestampRef.current) > FREEZE_THRESHOLD_MS) {
+        
+        if (!videoFrozenDetectedRef.current) {
+          console.warn("VIDEO FREEZE DETECTED! Stopping robot commands.");
+          console.log(`VIDEO FREEZE DETECTED! Stopping robot commands.`);
+          stopProcessingCommands(); // Stop commands if video freezes
+          videoFrozenDetectedRef.current = true;
+        }
+      } else if (currentFramesReceived > lastFramesReceivedRef.current) {
+        // If frames are being received again, reset the freeze detection
+        if (videoFrozenDetectedRef.current) {
+          console.log("Video stream resumed. Commands can potentially resume if new ArUco data arrives.");
+          videoFrozenDetectedRef.current = false;
+        }
+      }
+
+      // Update last known stats
+      lastFramesReceivedRef.current = currentFramesReceived;
+      lastVideoStatsTimestampRef.current = currentTimestamp;
+
+    } catch (error) {
+      console.error("Error fetching WebRTC stats for freeze detection:", error);
+      // If there's an error getting stats, assume a problem and stop commands
+      if (!videoFrozenDetectedRef.current) {
+        console.warn("Error getting WebRTC stats, assuming video issue. Stopping robot commands.");
+        stopProcessingCommands();
+        videoFrozenDetectedRef.current = true;
+      }
+    }
+  };
 
   const startCall = async () => {
     const pc = new RTCPeerConnection(servers);
@@ -121,7 +232,7 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
     });
 
     if (mqttClient && mqttTopic) {
-      mqttClient.publish(mqttTopic.toString(), JSON.stringify({ type: "videocall_on", callId: callDocRef.id }), 1);
+      mqttClient.publish(mqttTopic.toString(), JSON.stringify({ type: "videocall_on", callId: callDocRef.id, timestamp: Date.now() }), 1);
     }
 
     setIsCalling(true);
@@ -139,62 +250,20 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
       remoteAudioRef.current.srcObject = null;
     }
     if (mqttClient && mqttTopic) {
-      mqttClient.publish(mqttTopic.toString(), JSON.stringify({ type: "videocall_off" }), 1);
+      mqttClient.publish(mqttTopic.toString(), JSON.stringify({ type: "videocall_off", timestamp: Date.now() }), 1);
     }
     setIsCalling(false);
-  };
-
-  // New function to start processing a fresh set of commands
-  const startProcessingNewCommands = (commands) => {
-    // Clear any existing processing
-    if (commandTimeoutRef.current) {
-      clearTimeout(commandTimeoutRef.current);
-    }
-    isProcessingCommandsRef.current = true;
-    currentCommandsToProcessRef.current = commands;
-    commandIndexRef.current = 0;
-    processNextCommand(); // Start processing the new set
-  };
-
-  // Function to process the next command in the current list
-  const processNextCommand = () => {
-    if (!mqttClient || !mqttTopic) {
-        console.warn("MQTT client or topic not available for command publishing.");
-        stopProcessingCommands();
-        return;
-    }
-
-    if (commandIndexRef.current < currentCommandsToProcessRef.current.length) {
-      const command = currentCommandsToProcessRef.current[commandIndexRef.current];
-      console.log(`Publishing command to MQTT: ${command}`);
-      mqttClient.publish(mqttTopic.toString(), JSON.stringify({ type: "robot_command", command: command }), 1);
-
-      commandIndexRef.current += 1;
-      // Schedule the next command after a 2-second delay
-      commandTimeoutRef.current = setTimeout(processNextCommand, 2000);
-    } else {
-      // All commands in the current set have been published
-      stopProcessingCommands();
-    }
-  };
-
-  // Function to stop command processing and reset state
-  const stopProcessingCommands = () => {
-    if (commandTimeoutRef.current) {
-      clearTimeout(commandTimeoutRef.current);
-      commandTimeoutRef.current = null;
-    }
-    isProcessingCommandsRef.current = false;
-    currentCommandsToProcessRef.current = [];
-    commandIndexRef.current = 0;
-    console.log("Command processing stopped.");
   };
 
 
   // ArUco detection functions
   const startArUcoDetection = () => {
     if (!remoteVideoRef.current || !remoteVideoRef.current.srcObject) {
-      alert('No video stream available. Please start a video call first.');
+      // Using a custom message box instead of alert()
+      const message = 'No video stream available. Please start a video call first.';
+      console.warn(message);
+      // You would typically render a modal or a temporary message on the UI here
+      // For this example, we'll just log to console.
       return;
     }
 
@@ -243,7 +312,10 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
 
     ws.onerror = (error) => {
       console.error('WebSocket error:', error);
-      alert('Failed to connect to ArUco detection server. Make sure the Python server is running on localhost:8765');
+      // Using a custom message box instead of alert()
+      const message = 'Failed to connect to ArUco detection server. Make sure the Python server is running on localhost:8765';
+      console.error(message);
+      // You would typically render a modal or a temporary message on the UI here
       stopProcessingCommands(); // Ensure commands stop on error
     };
   };
@@ -314,10 +386,41 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
     }
   };
 
+  // Effect hook to manage the video freeze detection interval
+  useEffect(() => {
+    if (isCalling) {
+      // Start checking for video freeze when a call is active
+      statsIntervalIdRef.current = setInterval(checkVideoFreeze, 1000); // Check every 1 second
+    } else {
+      // Clear the interval when the call ends
+      if (statsIntervalIdRef.current) {
+        clearInterval(statsIntervalIdRef.current);
+        statsIntervalIdRef.current = null;
+      }
+      // Reset freeze detection state when call ends
+      lastFramesReceivedRef.current = 0;
+      lastVideoStatsTimestampRef.current = 0;
+      videoFrozenDetectedRef.current = false;
+    }
+
+    // Cleanup function for the effect
+    return () => {
+      if (statsIntervalIdRef.current) {
+        clearInterval(statsIntervalIdRef.current);
+        statsIntervalIdRef.current = null;
+      }
+    };
+  }, [isCalling]); // Re-run this effect when isCalling changes
+
+  // General cleanup on component unmount
   useEffect(() => () => {
     endCall();
     stopArUcoDetection();
     stopProcessingCommands(); // Final cleanup on unmount
+    if (statsIntervalIdRef.current) {
+      clearInterval(statsIntervalIdRef.current);
+      statsIntervalIdRef.current = null;
+    }
   }, []);
 
   return (
