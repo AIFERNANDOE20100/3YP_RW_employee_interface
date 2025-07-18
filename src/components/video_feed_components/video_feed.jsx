@@ -483,9 +483,9 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
         {isCalling && (
           <div style={{ marginTop: '10px' }}>
             {!isArUcoActive ? (
-              <VideoButton onClick={startArUcoDetection} variant="default">Start ArUco Detection</VideoButton>
+              <VideoButton onClick={startArUcoDetection} variant="default">Plug to Charging</VideoButton>
             ) : (
-              <VideoButton onClick={stopArUcoDetection} variant="destructive">Stop ArUco Detection</VideoButton>
+              <VideoButton onClick={stopArUcoDetection} variant="destructive">Stop Autonavigation</VideoButton>
             )}
           </div>
         )}
