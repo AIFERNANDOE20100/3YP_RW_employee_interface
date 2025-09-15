@@ -173,6 +173,13 @@ const VideoFeed = ({ mqttClient, mqttTopic }) => {
   };
 
   const startCall = async () => {
+    // Check if getUserMedia is available 
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { 
+      console.error('WebRTC is not supported in this browser or context (e.g., not a secure origin).'); 
+      // Display a user-friendly error message, e.g., using a state variable 
+      return; 
+    } 
+
     const pc = new RTCPeerConnection(servers);
     pcRef.current = pc;
 
